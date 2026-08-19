@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi · English Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="bg-texture" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="topbar__mark">EC</span>
+    <div class="topbar__word">
+      <strong>Absensi</strong>
+      <span>English Club · SMAN 10 Garut</span>
+    </div>
+  </div>
+  <nav class="topbar__nav" id="tabNav">
+    <button class="tab-btn is-active" data-view="recap">Recap</button>
+    <button class="tab-btn" data-view="input">Input Absen</button>
+    <button class="tab-btn" data-view="stats">Statistik</button>
+  </nav>
+  <button class="settings-btn" id="settingsBtn" title="Pengaturan sinkronisasi">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"/></svg>
+  </button>
+</header>
+
+<div class="sync-strip" id="syncStrip">
+  <span id="syncDot" class="sync-dot"></span>
+  <span id="syncText">Memeriksa koneksi ke Google Sheets…</span>
+</div>
+
+<main class="wrap">
+
+  <!-- ===== HERO / SUMMARY ===== -->
+  <section class="hero">
+    <div class="hero__title">
+      <span class="eyebrow">Buku Absen Digital</span>
+      <h1>Rekap kehadiran, tanpa PDF berulang.</h1>
+      <p>Setiap kumpulan, catat siapa hadir — sisanya biar halaman ini yang merekap, menghitung, dan mengingat.</p>
+    </div>
+    <div class="hero__stats" id="heroStats">
+      <div class="stat-card">
+        <span class="stat-num" id="statSesi">0</span>
+        <span class="stat-label">Kegiatan tercatat</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="statRata">0%</span>
+        <span class="stat-label">Rata-rata kehadiran</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="statTerakhir">–</span>
+        <span class="stat-label">Kegiatan terakhir</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIEW: RECAP ===== -->
+  <section class="view" id="view-recap">
+    <div class="view-head">
+      <h2>Recap Kegiatan</h2>
+      <div class="filter-bar">
+        <input type="text" id="filterSearch" placeholder="Cari nama kegiatan…">
+        <input type="date" id="filterFrom" title="Dari tanggal">
+        <span class="filter-sep">–</span>
+        <input type="date" id="filterTo" title="Sampai tanggal">
+        <button id="filterReset" class="btn-ghost">Reset</button>
+      </div>
+    </div>
+    <div id="recapList" class="recap-list"></div>
+    <p class="empty-state" id="recapEmpty" hidden>Belum ada kegiatan yang cocok. Coba ubah pencarian, atau tambah absen baru di tab <em>Input Absen</em>.</p>
+  </section>
+
+  <!-- ===== VIEW: INPUT ===== -->
+  <section class="view" id="view-input" hidden>
+    <div class="view-head">
+      <h2>Input Absen Kumpulan</h2>
+      <p class="view-sub">Isi setelah kumpulan selesai — anggota tinggal dicentang statusnya.</p>
+    </div>
+
+    <form id="absenForm" class="form-card">
+      <div class="form-row two-col">
+        <label class="field">
+          <span>Kegiatan dari Roadmap</span>
+          <select id="fRoadmap">
+            <option value="">— pilih dari roadmap (opsional) —</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Tanggal Kegiatan</span>
+          <input type="date" id="fTanggal" required>
+        </label>
+      </div>
+      <label class="field">
+        <span>Nama Kegiatan</span>
+        <input type="text" id="fNama" placeholder="mis. Materi 3 — Vocabulary & Sound Recognition" required>
+      </label>
+      <label class="field">
+        <span>Catatan Kegiatan</span>
+        <textarea id="fCatatan" rows="2" placeholder="Ringkasan singkat kegiatan / hal penting yang terjadi…"></textarea>
+      </label>
+
+      <div class="field">
+        <span>Kehadiran Anggota</span>
+        <div id="memberChecklist" class="member-checklist"></div>
+      </div>
+
+      <div class="form-actions">
+        <span class="form-hint" id="formHint"></span>
+        <button type="submit" class="btn-primary">Simpan Absen</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===== VIEW: STATS ===== -->
+  <section class="view" id="view-stats" hidden>
+    <div class="view-head">
+      <h2>Statistik Kehadiran</h2>
+      <p class="view-sub">Ledger kehadiran tiap anggota — satu titik mewakili satu kegiatan.</p>
+    </div>
+    <div id="statsList" class="stats-list"></div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>English Club · SMAN 10 Garut</span>
+  <span id="footerCount"></span>
+</footer>
+
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="modal-backdrop" id="modalBackdrop" hidden>
+  <div class="modal">
+    <h3>Sinkronisasi Google Sheets</h3>
+    <p class="modal-desc">Tempel URL Web App dari Google Apps Script di sini supaya data absen tersimpan di Google Sheets dan bisa diakses dari device lain. Lihat panduan di <code>README.md</code>.</p>
+    <label class="field">
+      <span>Apps Script Web App URL</span>
+      <input type="url" id="sheetsUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+    </label>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="modalClose">Tutup</button>
+      <button class="btn-primary" id="modalSave">Simpan &amp; Sinkron</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
